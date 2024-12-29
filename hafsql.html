@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hive Analytics Dashboard</title>
+    <style>
+        :root {
+            --glass-bg: rgba(16, 18, 27, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #212838;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+            linear-gradient(135deg, #212838 0%, #2d3748 50%, #1a202c 100%);
+        background-attachment: fixed;
+        color: var(--text-primary);
+        font-family: 'Inter', system-ui, sans-serif;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .settings {
+            padding: 24px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .main-content {
+            padding: 24px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        h1, h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        button:hover {
+            background: #7c3aed;
+            transform: translateY(-1px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 24px;
+        }
+
+        .results-table th {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .results-table th:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .results-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .results-table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .results-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar-container {
+            margin: 16px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .log {
+            height: 150px;
+            padding: 12px;
+            margin-top: 16px;
+            font-family: monospace;
+            font-size: 0.9em;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .log div {
+            padding: 4px 8px;
+            animation: slideIn 0.3s ease;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .log::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .log::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 4px;
+        }
+
+        .log::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .error { color: var(--error); }
+        .success { color: var(--success); }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #7c3aed;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-10px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .sort-icon::after {
+            content: '↕';
+            margin-left: 4px;
+            opacity: 0.5;
+        }
+
+        .sort-asc::after {
+            content: '↑';
+            opacity: 1;
+        }
+
+        .sort-desc::after {
+            content: '↓';
+            opacity: 1;
+        }
+
+        /* Add these new styles */
+        .file-upload {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload label {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload label:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .file-name {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .credentials-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .credentials-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .credentials-toggle:hover {
+            color: var(--text-primary);
+        }
+
+        .credentials-content {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .credentials-content.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .credentials-field {
+            margin-bottom: 0.5rem;
+        }
+
+        .credentials-field label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .credentials-field input {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hive Analytics Dashboard (using HafSQL)</h1>
+    
+    <div class="container">
+        <div class="settings glass">
+            <h3>Settings</h3>
+            <div>
+                <label>Days Back:</label>
+                <input type="number" id="daysInput" value="7" min="1" max="30">
+            </div>
+            <div>
+                <label>HBD Threshold:</label>
+                <input type="number" id="thresholdInput" value="0.001" step="0.001">
+            </div>
+            <div>
+                <label>Batch Size:</label>
+                <input type="number" id="batchSizeInput" value="1000" min="1" max="5000">
+            </div>
+            <div>
+                <label>Frontend:</label>
+                <select id="frontendSelect">
+                    <option value="https://peakd.com">PeakD</option>
+                    <option value="https://hive.blog">Hive.blog</option>
+                </select>
+            </div>
+            <h3>Accounts</h3>
+            <div class="file-upload">
+                <label for="fileInput">Upload Username List</label>
+                <input type="file" id="fileInput" accept=".txt" onChange="handleFileUpload(event)">
+                <span class="file-name" id="fileName"></span>
+            </div>
+            <textarea id="accountsInput" rows="10" placeholder="One account per line or upload a .txt file"></textarea>
+            <button id="fetchDataBtn" onclick="startMonitoring()">Start Monitoring</button>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+                <div id="progressText">0%</div>
+            </div>
+            
+            <div class="log" id="logArea"></div>
+
+            <div class="credentials-section">
+                <div class="credentials-toggle" onclick="toggleCredentials()">
+                    <span class="toggle-icon">▸</span>
+                    Custom HAFSQL Credentials
+                </div>
+                <div class="credentials-content" id="credentialsContent">
+                    <div class="credentials-field">
+                        <label for="hafsqlHost">Host:</label>
+                        <input type="text" id="hafsqlHost" value="hafsql.mahdiyari.info" placeholder="HAFSQL host">
+                    </div>
+                    <div class="credentials-field">
+                        <label for="hafsqlPort">Port:</label>
+                        <input type="number" id="hafsqlPort" value="5432" placeholder="Port number">
+                    </div>
+                    <div class="credentials-field">
+                        <label for="hafsqlDB">Database:</label>
+                        <input type="text" id="hafsqlDB" value="haf_block_log" placeholder="Database name">
+                    </div>
+                    <div class="credentials-field">
+                        <label for="hafsqlUser">Username:</label>
+                        <input type="text" id="hafsqlUser" value="hafsql_public" placeholder="Username">
+                    </div>
+                    <div class="credentials-field">
+                        <label for="hafsqlPassword">Password:</label>
+                        <input type="password" id="hafsqlPassword" value="hafsql_public" placeholder="Password">
+                    </div>
+                    <button onclick="updateCredentials()" class="update-credentials">Update Credentials</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content glass">
+            <div class="stats" id="statsArea">
+                <div class="stat-box">
+                    <h4>Processed</h4>
+                    <div id="processedCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Remaining</h4>
+                    <div id="remainingCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Posts Found</h4>
+                    <div id="postsCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Total Value</h4>
+                    <div id="totalValue">0 HBD</div>
+                </div>
+            </div>
+            
+            <table class="results-table" id="resultsTable">
+                <thead>
+                    <tr>
+                        <th data-sort="username">Author</th>
+                        <th data-sort="date">Date</th>
+                        <th data-sort="title">Title</th>
+                        <th data-sort="value">Value</th>
+                        <th data-sort="votes">Votes</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // First, declare all functions that are used in HTML attributes
+        function toggleCredentials() {
+            const content = document.getElementById('credentialsContent');
+            const toggle = document.querySelector('.credentials-toggle');
+            const icon = toggle.querySelector('.toggle-icon');
+            
+            content.classList.toggle('show');
+            icon.textContent = content.classList.contains('show') ? '▾' : '▸';
+        }
+
+        // Credential management functions
+        function saveCredentials(credentials) {
+            localStorage.setItem('hafsqlCredentials', JSON.stringify(credentials));
+        }
+
+        function loadCredentials() {
+            const savedCredentials = localStorage.getItem('hafsqlCredentials');
+            if (savedCredentials) {
+                const creds = JSON.parse(savedCredentials);
+                Object.entries({
+                    hafsqlHost: creds.host,
+                    hafsqlPort: creds.port,
+                    hafsqlDB: creds.database,
+                    hafsqlUser: creds.user,
+                    hafsqlPassword: creds.password
+                }).forEach(([id, value]) => {
+                    if (value) document.getElementById(id).value = value;
+                });
+            }
+        }
+
+        function updateCredentials() {
+            const credentials = {
+                host: document.getElementById('hafsqlHost').value.trim(),
+                port: Number(document.getElementById('hafsqlPort').value),
+                database: document.getElementById('hafsqlDB').value.trim(),
+                user: document.getElementById('hafsqlUser').value.trim(),
+                password: document.getElementById('hafsqlPassword').value.trim()
+            };
+
+            // Validate input
+            if (!credentials.host || !credentials.database || !credentials.user || !credentials.password) {
+                addLog('All fields are required', 'error');
+                return;
+            }
+
+            // Disable the update button while connecting
+            const updateButton = document.querySelector('.update-credentials');
+            updateButton.disabled = true;
+            updateButton.textContent = 'Connecting...';
+            
+            addLog('Testing connection...', 'info');
+
+            fetch('/update-credentials', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(credentials)
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || `Server error: ${response.status}`);
+                }
+                return data;
+            })
+            .then(data => {
+                if (data.success) {
+                    saveCredentials(credentials);
+                    addLog('Connection successful!', 'success');
+                    addLog(`Connected to: ${credentials.host}:${credentials.port}`, 'success');
+                    addLog(`Database: ${credentials.database}`, 'success');
+                    
+                    if (data.details && data.details.tables) {
+                        const tables = data.details.tables;
+                        addLog('Table status:', 'info');
+                        addLog(`- Comments table: ${tables.comments ? '✓' : '✗'}`, tables.comments ? 'success' : 'error');
+                        addLog(`- Votes table: ${tables.op_vote ? '✓' : '✗'}`, tables.op_vote ? 'success' : 'error');
+                        addLog(`- Reputations table: ${tables.reputations ? '✓' : '✗'}`, tables.reputations ? 'success' : 'error');
+                    }
+                } else {
+                    throw new Error(data.error || 'Unknown connection error');
+                }
+            })
+            .catch(error => {
+                addLog('Connection failed!', 'error');
+                addLog(`Error: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                updateButton.disabled = false;
+                updateButton.textContent = 'Update Credentials';
+            });
+        }
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSorting();
+            loadCredentials();
+        });
+
+        let settings = {
+            daysBack: 7,
+            hbdThreshold: 0.001,
+            batchSize: 1000,  // Changed from 10 to 1000
+            frontend: "https://peakd.com",
+            isMonitoring: false,
+            currentBatch: 0,
+            totalAccounts: 0,
+            isPaused: false
+        };
+
+        let accountQueue = [];
+        let processedAccounts = new Set();
+        let tableData = [];
+
+        // Initialize settings from input fields
+        function initializeSettings() {
+            settings.daysBack = Number(document.getElementById('daysInput').value);
+            settings.hbdThreshold = Number(document.getElementById('thresholdInput').value);
+            settings.batchSize = Number(document.getElementById('batchSizeInput').value);
+            settings.frontend = document.getElementById('frontendSelect').value;
+        }
+
+        async function fetchPostsFromHafsql(usernames) {
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        usernames: usernames,
+                        days: settings.daysBack,
+                        threshold: settings.hbdThreshold
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                const { success, data, error, stats } = await response.json();
+                
+                if (!success) throw new Error(error);
+                
+                if (stats) {
+                    document.getElementById('postsCount').textContent = stats.total_posts;
+                    document.getElementById('totalValue').textContent = 
+                        `${stats.total_value.toFixed(3)} HBD`;
+                }
+                
+                return data.map(post => ({
+                    username: post.author,
+                    // Store both ISO string and formatted date for proper sorting
+                    dateISO: post.created,
+                    date: new Date(post.created).toLocaleString(),
+                    link: `${settings.frontend}/@${post.author}/${post.permlink}`,
+                    value: parseFloat(post.pending_payout_value.split(' ')[0]),
+                    title: post.title || 'Untitled',
+                    reputation: post.user_reputation,
+                    votes: post.vote_count,
+                    total_payout: parseFloat(post.total_payout_value.split(' ')[0])
+                }));
+            } catch (error) {
+                addLog(`Error: ${error.message}`, 'error');
+                return [];
+            }
+        }
+
+        function addLog(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            
+            // Add the new entry
+            logArea.appendChild(logEntry);
+            
+            // Ensure smooth scroll to bottom
+            requestAnimationFrame(() => {
+                logArea.scrollTop = logArea.scrollHeight;
+            });
+
+            // Trim old messages if there are too many (optional)
+            while (logArea.children.length > 100) {
+                logArea.removeChild(logArea.firstChild);
+            }
+        }
+
+        function updateProgress() {
+            const processed = processedAccounts.size;
+            const total = settings.totalAccounts;
+            const percent = Math.round((processed / total) * 100);
+            
+            document.querySelector('.progress-bar').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = `${percent}%`;
+            
+            // Update stats
+            document.getElementById('processedCount').textContent = processed;
+            document.getElementById('remainingCount').textContent = total - processed;
+            document.getElementById('postsCount').textContent = tableData.length;
+            
+            const totalValue = tableData.reduce((sum, row) => sum + row.value, 0);
+            document.getElementById('totalValue').textContent = `${totalValue.toFixed(3)} HBD`;
+        }
+
+        async function addResultRow(post) {
+            tableData.push(post);
+            renderSortedTable();
+        }
+
+        function renderSortedTable() {
+            const tbody = document.querySelector('#resultsTable tbody');
+            tbody.innerHTML = '';
+            
+            tableData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.username}</td>
+                    <td data-date="${row.dateISO}">${row.date}</td>
+                    <td>${row.title}</td>
+                    <td>${row.value.toFixed(3)} HBD</td>
+                    <td>${row.votes}</td>
+                    <td><a href="${row.link}" target="_blank">View</a></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function startMonitoring() {
+            if (settings.isMonitoring) {
+                pauseMonitoring();
+                return;
+            }
+
+            initializeSettings();
+            const accounts = document.getElementById('accountsInput').value
+                .split('\n')
+                .map(a => a.trim())
+                .filter(Boolean);
+
+            if (!accounts.length) {
+                alert('Please enter at least one account');
+                return;
+            }
+
+            settings.isMonitoring = true;
+            settings.isPaused = false;
+            settings.totalAccounts = accounts.length;
+            accountQueue = [...accounts];
+            processedAccounts.clear();
+            tableData = [];
+
+            document.querySelector('.progress-bar-container').style.display = 'block';
+            document.getElementById('fetchDataBtn').textContent = 'Pause';
+            
+            addLog('Starting monitoring...', 'success');
+            processBatch();
+        }
+
+        function pauseMonitoring() {
+            settings.isPaused = true;
+            settings.isMonitoring = false;
+            document.getElementById('fetchDataBtn').textContent = 'Resume';
+            addLog('Monitoring paused', 'info');
+        }
+
+        function stopMonitoring() {
+            settings.isMonitoring = false;
+            settings.isPaused = false;
+            document.getElementById('fetchDataBtn').textContent = 'Start Monitoring';
+            addLog('Monitoring completed', 'success');
+        }
+
+        async function processBatch() {
+            if (!settings.isMonitoring || settings.isPaused) return;
+
+            const batchSize = Math.min(settings.batchSize, accountQueue.length);
+            if (batchSize === 0) {
+                addLog('All accounts processed', 'success');
+                stopMonitoring();
+                return;
+            }
+
+            const batch = accountQueue.splice(0, batchSize);
+            
+            try {
+                const posts = await fetchPostsFromHafsql(batch);
+                for (const post of posts) {
+                    await addResultRow(post);
+                }
+
+                batch.forEach(account => processedAccounts.add(account));
+                updateProgress();
+
+                if (accountQueue.length > 0) {
+                    setTimeout(() => processBatch(), 1000);
+                } else {
+                    addLog('Processing completed', 'success');
+                    stopMonitoring();
+                }
+            } catch (error) {
+                addLog(`Batch processing error: ${error.message}`, 'error');
+                pauseMonitoring();
+            }
+        }
+
+        // Add sorting functionality
+        function initializeSorting() {
+            let currentSort = { key: 'date', order: 'desc' }; // Default sort
+
+            document.querySelectorAll('#resultsTable th[data-sort]').forEach(header => {
+                const sortKey = header.dataset.sort;
+                header.classList.add('sort-icon');
+                
+                header.addEventListener('click', () => {
+                    // If clicking the same header, toggle order, else default to asc
+                    if (currentSort.key === sortKey) {
+                        currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.key = sortKey;
+                        currentSort.order = 'asc';
+                    }
+                    
+                    // Reset all headers
+                    document.querySelectorAll('#resultsTable th').forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    
+                    // Add sort indicator to current header
+                    header.classList.add(`sort-${currentSort.order}`);
+                    
+                    // Sort the data
+                    tableData.sort((a, b) => {
+                        let comparison;
+                        switch(sortKey) {
+                            case 'date':
+                                comparison = new Date(a.dateISO) - new Date(b.dateISO);
+                                break;
+                            case 'value':
+                                comparison = parseFloat(a.value) - parseFloat(b.value);
+                                break;
+                            case 'votes':
+                                comparison = parseInt(a.votes) - parseInt(b.votes);
+                                break;
+                            default:
+                                comparison = String(a[sortKey] || '').localeCompare(String(b[sortKey] || ''));
+                        }
+                        return currentSort.order === 'desc' ? -comparison : comparison;
+                    });
+                    
+                    renderSortedTable();
+                });
+            });
+
+            // Initial sort by date (newest first)
+            const dateHeader = document.querySelector('th[data-sort="date"]');
+            if (dateHeader) {
+                dateHeader.click();
+            }
+        }
+
+        // Initialize sorting when the document is loaded
+        document.addEventListener('DOMContentLoaded', initializeSorting);
+
+        // Add this new function after the settings declaration
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Update file name display
+            document.getElementById('fileName').textContent = file.name;
+
+            try {
+                const text = await file.text();
+                const accounts = text
+                    .split(/[\n,]/) // Split by newline or comma
+                    .map(account => account.trim())
+                    .filter(account => account.length > 0);
+
+                // Update textarea with the loaded accounts
+                document.getElementById('accountsInput').value = accounts.join('\n');
+                addLog(`Loaded ${accounts.length} accounts from ${file.name}`, 'success');
+            } catch (error) {
+                addLog(`Error reading file: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
