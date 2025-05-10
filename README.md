@@ -61,7 +61,7 @@ http://localhost:3000
 The dashboard comes preconfigured to connect to the public HafSQL instance:
 
 ```
-Host: hafsql.mahdiyari.info
+Host: hafsql-sql.mahdiyari.info
 Port: 5432
 Database: haf_block_log
 Username: hafsql_public
