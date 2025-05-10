@@ -124,7 +124,7 @@ app.post('/update-credentials', async (req, res) => {
         
         // Restore default configuration if needed
         await dbManager.createNewPool({
-            host: 'hafsql.mahdiyari.info',
+            host: 'hafsql-sql.mahdiyari.info',
             port: 5432,
             database: 'haf_block_log',
             user: 'hafsql_public',
