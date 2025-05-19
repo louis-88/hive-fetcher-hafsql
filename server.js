@@ -162,11 +162,11 @@ app.post('/query', async (req, res) => {
                 c.total_payout_value,
                 r.reputation AS user_reputation,
                 COUNT(v.voter) AS vote_count
-            FROM comments c
-            LEFT JOIN op_vote v
+            FROM hafsql.comments    AS c
+            LEFT JOIN hafsql.operation_vote_view AS v
                    ON v.author = c.author
                   AND v.permlink = c.permlink
-            LEFT JOIN reputations r
+            LEFT JOIN hafsql.reputations AS r
                    ON r.account_name = c.author
             WHERE c.parent_author = ''
               AND c.author = ANY($1)
